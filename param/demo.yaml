@@ -1,0 +1,8 @@
+anchors:
+    - [0, 0]
+    - [0.514, 0.168]
+    - [0.0762, 0.406]
+transition_matrix: [1, 0, 0, 1]
+observation_matrix: [1, 0, 0, 1]
+initial_state: [0, 0]
+initial_cov: [0.1, 0, 0, 0.1]

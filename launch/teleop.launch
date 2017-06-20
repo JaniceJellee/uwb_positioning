@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="name" />
+  <arg name="joy_dev" default="/dev/input/js0" />
+
+
+  <node name="dq_joy" pkg="joy" type="joy_node" output="screen" >
+    <param name="dev" value="$(arg joy_dev)" />
+  </node>
+
+  <node name="teleop" pkg="decawave_localization" type="teleop.py" output="screen" ></node>
+
+  
+</launch>

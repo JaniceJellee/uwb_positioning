@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="car_frame_id" value="car/base_link"/>
+    <arg name="map_frame_id" value="map"/>
+    <rosparam param="tag_names">
+        ["tag_right_center", "tag_left_back", "tag_left_front"]
+    </rosparam>
+    <rosparam param="offsets">
+        [-0.134, -0.169, -0.106]
+    </rosparam>
+
+
+    <!-- Reading from tag sensors -->
+
+    <node name="reader_top_left" type="tag.py" pkg="decawave_localization"
+        output="screen">
+        <param name="port" value="/dev/ttyACM0"/>
+        <param name="baud" value="115200"/>
+        <param name="frequency" value="100"/>
+    </node>
+
+    <node name="reader_top_right" type="tag.py" pkg="decawave_localization"
+        output="screen">
+        <param name="port" value="/dev/ttyACM1"/>
+        <param name="baud" value="115200"/>
+        <param name="frequency" value="100"/>
+    </node>
+
+<!--     <node name="reader_bottom_right" type="tag.py" pkg="decawave_localization"
+        output="screen">
+        <param name="port" value="/dev/ttyACM2"/>
+        <param name="baud" value="115200"/>
+        <param name="frequency" value="100"/>
+    </node> -->
+
+    <node name="filter_top_left" type="kalman.py" pkg="decawave_localization" output="screen">
+        <param name="tag_range_topic" value="tag_left_front/range" />
+    </node>
+
+    <node name="filter_top_right" type="kalman.py" pkg="decawave_localization" output="screen">
+        <param name="tag_range_topic" value="tag_left_back/range" />
+    </node>
+
+    <node name="filter_bottom_right" type="kalman.py" pkg="decawave_localization" output="screen">
+        <param name="tag_range_topic" value="tag_right_center/range" />
+    </node>
+
+    <!-- Static transforms from the car frame to the tags -->
+
+    <node pkg="tf" type="static_transform_publisher" name="car_to_tag_left_front"
+        args="0.51 0.37 0 0 0 0 $(arg car_frame_id) tag_left_front 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="car_to_tag_right_center"
+        args="-0.03 -0.31 0 0 0 0 $(arg car_frame_id) tag_right_center 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="car_to_tag_left_back"
+        args="-0.54 0.29 0 0 0 0 $(arg car_frame_id) tag_left_back 100" />
+
+    <!-- Dummy transform from map to car -->
+
+    <node pkg="tf" type="static_transform_publisher" name="map_to_car"
+        args="1 0 0 0 0 0 $(arg map_frame_id) $(arg car_frame_id) 100" />
+
+    <!-- Running the trilateration node -->
+    <node pkg="decawave_localization" type="localize.py"
+        name="decawave_localization" output="screen">
+        <param name="frame_id" value="$(arg car_frame_id)"/>
+        <param name="frequency" value="30"/>
+        <param name="cov_x" value="0.6"/>
+        <param name="cov_y" value="0.6"/>
+        <param name="cov_sensor" value="0.3"/>
+        <rosparam>
+            tag_range_topics:
+                - tag_left_front/range_filtered
+                - tag_left_back/range_filtered
+                - tag_right_center/range_filtered
+            transition_matrix: [0.01, 0, 0, 0.01]
+            observation_matrix: [1, 0, 0, 1]
+            initial_state: [0, 0]
+            initial_cov: [0.1, 0, 0, 0.1]
+        </rosparam>
+    </node>
+</launch>
