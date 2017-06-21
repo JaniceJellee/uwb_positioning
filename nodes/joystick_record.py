@@ -44,7 +44,7 @@ class JoystickCommandCenter(object):
                 'home transz', 'home rotx', 'home roty', 'home rotz', 'home rotw'])
         self.writer.writerow([])
 
-    def empty_rows(): 
+    def empty_rows(self): 
         self.row = []
         self.tag_row = []
         self.home_row = []
@@ -53,7 +53,7 @@ class JoystickCommandCenter(object):
     def joy_sub(self, joy):
         if joy.buttons[Buttons.A] > 0:
             rospy.loginfo("======================================")
-            empty_rows()
+            self.empty_rows()
             self.writer.writerow([])
             self.state = True
             self.time = time.time()
@@ -73,11 +73,12 @@ class JoystickCommandCenter(object):
     def uwb_range(self, data):
         info = rospy.get_caller_id() + " : I heard %s" % data
         if self.state and (time.time() - self.time < 5):
-            if len(self.row) > 0:
+            if len(self.row) > 0 and len(self.tag_row) > 0 and len(self.home_row) > 0:
                 self.row.extend(self.tag_row)
                 self.row.extend(self.home_row)
-                self.writer.writerow(self.row)
-                empty_rows()
+                if len(self.row) == 15:
+                    self.writer.writerow(self.row)
+            self.empty_rows()
             rospy.loginfo(info)
             self.row.append(data.range)
             self.get_position_mochi = True
