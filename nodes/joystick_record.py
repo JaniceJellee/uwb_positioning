@@ -9,7 +9,7 @@ from geometry_msgs.msg import TransformStamped
 import csv
 import time
 
-NODE_NAME = "joystick"
+NODE_NAME = "joystick_record"
 n = roshelper.Node(NODE_NAME, anonymous=False)
 JOY_TOPIC = "joy"
 
@@ -37,10 +37,6 @@ class JoystickCommandCenter(object):
         self.tag_row = []
         self.home_row = []
 
-        self.tests = []
-        for distance in DISTANCES:
-            for angle in ANGLES:
-                self.tests.append((distance, angle))
         self.f = open(FILE_PATH, "wb")
         self.writer = csv.writer(self.f, delimiter=',', quotechar='"')
         self.writer.writerow(['predicted distance', 'tag transx', 'tag transy', 'tag transz', 'tag rotx', 
@@ -48,28 +44,21 @@ class JoystickCommandCenter(object):
                 'home transz', 'home rotx', 'home roty', 'home rotz', 'home rotw'])
         self.writer.writerow([])
 
+    def empty_rows(): 
+        self.row = []
+        self.tag_row = []
+        self.home_row = []
+
     @n.subscriber(JOY_TOPIC, Joy)
     def joy_sub(self, joy):
         if joy.buttons[Buttons.A] > 0:
-            distance, angle =  self.tests[self.index]
             rospy.loginfo("======================================")
-            rospy.loginfo("distance: " + str(distance) + "m, ANGLE: " + str(angle) + u"\u00b0".encode('utf-8'))
-            self.writer.writerow(["distance", distance, "angle", angle])
+            empty_rows()
+            self.writer.writerow([])
             self.state = True
             self.time = time.time()
-
         if joy.buttons[Buttons.B] > 0:
             self.state = False
-            self.index += 1
-            if self.index < len(self.tests):
-                distance, angle =  self.tests[self.index]
-                rospy.loginfo("DONE! Next: ")
-                rospy.loginfo("distance: " + str(distance) + "m, ANGLE: " + str(angle) + u"\u00b0".encode('utf-8'))
-            else:
-                self.f.close()
-                rospy.loginfo("======================================")
-                rospy.loginfo("FINISHED")
-
         self.last_joy = joy
 
     @n.subscriber(JOY_TOPIC, Joy)
@@ -83,14 +72,12 @@ class JoystickCommandCenter(object):
     @n.subscriber("/mochi_uwb/range", Range)
     def uwb_range(self, data):
         info = rospy.get_caller_id() + " : I heard %s" % data
-        if self.state and (time.time() - self.time < 2):
+        if self.state and (time.time() - self.time < 5):
             if len(self.row) > 0:
                 self.row.extend(self.tag_row)
                 self.row.extend(self.home_row)
                 self.writer.writerow(self.row)
-                self.row = []
-                self.tag_row = []
-                self.home_row = []
+                empty_rows()
             rospy.loginfo(info)
             self.row.append(data.range)
             self.get_position_mochi = True

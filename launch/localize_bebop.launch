@@ -13,36 +13,36 @@
 
     <!-- Reading from tag sensors -->
 
-    <node name="reader_top_left" type="tag.py" pkg="decawave_localization"
+    <node name="reader_top_left" type="tag.py" pkg="uwb_variance"
         output="screen">
         <param name="port" value="/dev/ttyACM0"/>
         <param name="baud" value="115200"/>
         <param name="frequency" value="100"/>
     </node>
 
-    <node name="reader_top_right" type="tag.py" pkg="decawave_localization"
+    <node name="reader_top_right" type="tag.py" pkg="uwb_variance"
         output="screen">
         <param name="port" value="/dev/ttyACM1"/>
         <param name="baud" value="115200"/>
         <param name="frequency" value="100"/>
     </node>
 
-<!--     <node name="reader_bottom_right" type="tag.py" pkg="decawave_localization"
+<!--     <node name="reader_bottom_right" type="tag.py" pkg="uwb_variance"
         output="screen">
         <param name="port" value="/dev/ttyACM2"/>
         <param name="baud" value="115200"/>
         <param name="frequency" value="100"/>
     </node> -->
 
-    <node name="filter_top_left" type="kalman.py" pkg="decawave_localization" output="screen">
+    <node name="filter_top_left" type="kalman.py" pkg="uwb_variance" output="screen">
         <param name="tag_range_topic" value="tag_left_front/range" />
     </node>
 
-    <node name="filter_top_right" type="kalman.py" pkg="decawave_localization" output="screen">
+    <node name="filter_top_right" type="kalman.py" pkg="uwb_variance" output="screen">
         <param name="tag_range_topic" value="tag_left_back/range" />
     </node>
 
-    <node name="filter_bottom_right" type="kalman.py" pkg="decawave_localization" output="screen">
+    <node name="filter_bottom_right" type="kalman.py" pkg="uwb_variance" output="screen">
         <param name="tag_range_topic" value="tag_right_center/range" />
     </node>
 
@@ -63,8 +63,8 @@
         args="1 0 0 0 0 0 $(arg map_frame_id) $(arg car_frame_id) 100" />
 
     <!-- Running the trilateration node -->
-    <node pkg="decawave_localization" type="localize.py"
-        name="decawave_localization" output="screen">
+    <node pkg="uwb_variance" type="localize.py"
+        name="uwb_variance" output="screen">
         <param name="frame_id" value="$(arg car_frame_id)"/>
         <param name="frequency" value="30"/>
         <param name="cov_x" value="0.6"/>

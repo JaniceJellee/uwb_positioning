@@ -5,14 +5,14 @@ import rospy
 import serial
 from sensor_msgs.msg import Range
 
-NODE_NAME = "decawave_tag"
+NODE_NAME = "decawave_home"
 DIST_TOPIC = "range"
 
 
 class DecaWaveTag:
 
     def __init__(self):
-        port = rospy.get_param('~port', '/dev/ttyACM1')
+        port = rospy.get_param('~port', '/dev/ttyACM0')
         baud = rospy.get_param('~baud', 115200)
         self.tag_names = rospy.get_param("tag_names")
         self.offsets = rospy.get_param("offsets")
@@ -51,7 +51,7 @@ class DecaWaveTag:
                 self.offset = float(self.offsets[tag_id])
                 self.rng.header.frame_id = self.tag_names[tag_id]
                 #topic_name = "/{}/{}".format(self.tag_names[tag_id], DIST_TOPIC)
-                self.pub = rospy.Publisher('chatter', Range, queue_size=1)
+                self.pub = rospy.Publisher('chowder', Range, queue_size=1)
             except IndexError:
                 pass
         self.rng.header.stamp = rospy.Time.now()

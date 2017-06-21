@@ -9,7 +9,7 @@
     <param name="dev" value="$(arg joy_dev)" />
   </node>
 
-  <node name="teleop" pkg="decawave_localization" type="teleop.py" output="screen" ></node>
+  <node name="teleop" pkg="uwb_variance" type="teleop.py" output="screen" ></node>
 
   
 </launch>
