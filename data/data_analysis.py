@@ -106,10 +106,6 @@ for row in csv_f:
 #        print (angle)
 #        print (angle, angle_tag[2], angle_home[2])
 
-#    n += 1
-#    if n > 1000:
-#        break
-
 f.close()
 
 fig = plt.figure()
@@ -118,20 +114,30 @@ ax = fig.add_subplot(111, projection='3d')
 ax.set_xlabel('Distance (m)')
 ax.set_ylabel('Angle (rad)')
 ax.set_zlabel('Variance')
-#print (x_actual_dists)
-#print (y_angles)
-#print (z_vars)
-ax.scatter(x_actual_dists, y_angles, z_vars)
+#ax.scatter(x_actual_dists, y_angles, z_vars)
 #ax.plot_wireframe(x_actual_dists, y_angles, z_vars)
 #ax.plot_surface(x_actual_dists, y_angles, z_vars)
 
+# to see range
 print ("MIN DIST:", min(x_actual_dists))
 print ("MAX DIST:", max(x_actual_dists))
 print ("MIN ANG:", min(y_angles))
 print ("MAX ANG:", max(y_angles))
 
+# gets x y z triplets
+#FILE_PATH = "/Users/Janice/Dropbox (MIT)/Documents/Summer UROP/uwb_variance/data/datapoints.csv"
+#
+#f = open(FILE_PATH, "w", newline="")
+#writer = csv.writer(f, delimiter=',', quotechar='"')
+#writer.writerow(['actual dist', 'angle', 'var'])
+#writer.writerow([])
+#
+#for i in range(len(x_actual_dists)):
+#    writer.writerow([x_actual_dists[i], y_angles[i], z_vars[i]])
+#f.close()
 
-FILE_PATH = "/Users/Janice/Dropbox (MIT)/Documents/Summer UROP/uwb_variance/data/datapoints.csv"
+# organize into ranges
+FILE_PATH = "/Users/Janice/Dropbox (MIT)/Documents/Summer UROP/uwb_variance/data/rectangle.csv"
 
 f = open(FILE_PATH, "w", newline="")
 writer = csv.writer(f, delimiter=',', quotechar='"')
@@ -139,9 +145,12 @@ writer.writerow(['actual dist', 'angle', 'var'])
 writer.writerow([])
 
 for i in range(len(x_actual_dists)):
-    writer.writerow([x_actual_dists[i], y_angles[i], z_vars[i]])
+    dist = x_actual_dists[i]
+    ang = y_angles[i]
+    x = str(round((int((dist/.25))*.25), 2)) + "-" + str(round((int((dist/.25))*.25)+.25, 2))
+    y = str(round((int((ang/.2))*.2), 1)) + "-" + str(round((int((ang/.2))*.2)+.2, 1))
+    z = z_vars[i]
+    writer.writerow([x, y, z])
 f.close()
 
-for n in range(10000):
-    print ("dist: ", x_actual_dists[n])
-    print ("ang: ", y_angles[n])
+
