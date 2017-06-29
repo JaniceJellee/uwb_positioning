@@ -10,9 +10,6 @@ import statsmodels.formula.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
 f = open('combined_data.csv')
 csv_f = csv.reader(f)
 
@@ -37,7 +34,7 @@ class Labels(object):
     home_rotz = 13
     home_rotw = 14
 
-n = 0 
+#n = 0 
 current_predicted_dists = []
 current_measured_dists = []
 current_measured_angs = []
@@ -95,13 +92,18 @@ for row in csv_f:
                                       row[Labels.home_rotz],
                                       row[Labels.home_rotw]], axes="sxyz")
         a1 = angle_tag[2]
+        a2 = angle_home[2]
         if a1 < 0:
             a1 += math.pi
-        a2 = angle_home[2]
-        angle = a1 - a2
+        if a2 < 0:
+            a2 += math.pi
+        angle = abs(a2-a1)
         if angle > math.pi/2:
             angle = math.pi - angle
+#        if angle < 0:
+#            angle += math.pi
         current_measured_angs.append(angle)
+#        print (angle)
 #        print (angle, angle_tag[2], angle_home[2])
 
 #    n += 1
@@ -109,37 +111,37 @@ for row in csv_f:
 #        break
 
 f.close()
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
 ax.set_xlabel('Distance (m)')
 ax.set_ylabel('Angle (rad)')
 ax.set_zlabel('Variance')
 #print (x_actual_dists)
 #print (y_angles)
 #print (z_vars)
-#ax.scatter(x_actual_dists, y_angles, z_vars)
+ax.scatter(x_actual_dists, y_angles, z_vars)
 #ax.plot_wireframe(x_actual_dists, y_angles, z_vars)
 #ax.plot_surface(x_actual_dists, y_angles, z_vars)
 
-data = pd.DataFrame({"X": x_actual_dists, "Y": y_angles, "Z": z_vars})
-result = sm.ols(formula="Z ~ np.power(X, .005) + np.power(Y, .5)", data=data).fit()
+print ("MIN DIST:", min(x_actual_dists))
+print ("MAX DIST:", max(x_actual_dists))
+print ("MIN ANG:", min(y_angles))
+print ("MAX ANG:", max(y_angles))
 
-print (result.params)
-print (result.summary())
 
+FILE_PATH = "/Users/Janice/Dropbox (MIT)/Documents/Summer UROP/uwb_variance/data/datapoints.csv"
 
-# Doesn't work yet 
-## create some random data; replace that by your actual dataset
-#data = pd.DataFrame({"X": x_actual_dists, "Y": y_angles, "Z": z_vars})
-#
-## plot heatmap
-#ax = sns.heatmap(data.T)
-#
-## turn the axis label
-#for item in ax.get_yticklabels():
-#    item.set_rotation(0)
-#
-#for item in ax.get_xticklabels():
-#    item.set_rotation(90)
-#
-## save figure
-#plt.savefig('seabornPandas.png', dpi=100)
-#plt.show()
+f = open(FILE_PATH, "w", newline="")
+writer = csv.writer(f, delimiter=',', quotechar='"')
+writer.writerow(['actual dist', 'angle', 'var'])
+writer.writerow([])
+
+for i in range(len(x_actual_dists)):
+    writer.writerow([x_actual_dists[i], y_angles[i], z_vars[i]])
+f.close()
+
+for n in range(10000):
+    print ("dist: ", x_actual_dists[n])
+    print ("ang: ", y_angles[n])
