@@ -26,37 +26,21 @@ class Buttons(object):
 class JoystickCommandCenter(object):
 
     def __init__(self):
-        # self.planner_enabled = False
         self.last_joy = Joy()
         self.state = False
-        self.get_position_mochi = False
-        self.get_position_home = False
-        self.index = 0
         self.time = time.time()
-        self.row = []
-        self.tag_row = []
-        self.home_row = []
-
+        self.msg = False
         self.f = open(FILE_PATH, "wb")
         self.writer = csv.writer(self.f, delimiter=',', quotechar='"')
-        self.writer.writerow(['predicted distance', 'tag transx', 'tag transy', 'tag transz', 'tag rotx', 
-                'tag roty', 'tag rotz', 'tag rotw'] + ['home transx', 'home transy',
-                'home transz', 'home rotx', 'home roty', 'home rotz', 'home rotw'])
-        self.writer.writerow([])
-
-    def empty_rows(self): 
-        self.row = []
-        self.tag_row = []
-        self.home_row = []
 
     @n.subscriber(JOY_TOPIC, Joy)
     def joy_sub(self, joy):
         if joy.buttons[Buttons.A] > 0:
             rospy.loginfo("======================================")
-            self.empty_rows()
             self.writer.writerow([])
             self.state = True
             self.time = time.time()
+            self.msg = True
         if joy.buttons[Buttons.B] > 0:
             self.state = False
         self.last_joy = joy
@@ -73,37 +57,33 @@ class JoystickCommandCenter(object):
     def uwb_range(self, data):
         info = rospy.get_caller_id() + " : I heard %s" % data
         if self.state and (time.time() - self.time < 5):
-            if len(self.row) > 0 and len(self.tag_row) > 0 and len(self.home_row) > 0:
-                self.row.extend(self.tag_row)
-                self.row.extend(self.home_row)
-                if len(self.row) == 15:
-                    self.writer.writerow(self.row)
-            self.empty_rows()
             rospy.loginfo(info)
-            self.row.append(data.range)
-            self.get_position_mochi = True
-            self.get_position_home = True
-
-    @n.subscriber("/vicon/mochi_uwb/mochi_uwb", TransformStamped)
-    def tag_position(self, data):
-        info = rospy.get_caller_id() + " : I heard %s" % data
-        if self.state and self.get_position_mochi:
-            rospy.loginfo(info)
-            self.tag_row.extend([data.transform.translation.x, data.transform.translation.y,
-                data.transform.translation.z, data.transform.rotation.x, data.transform.rotation.y,
-                data.transform.rotation.z, data.transform.rotation.w])
-            self.get_position_mochi = False
-
-    @n.subscriber("/vicon/home_uwb/home_uwb", TransformStamped)
-    def home_position(self, data):
-        info = rospy.get_caller_id() + " : I heard %s" % data
-        if self.state and self.get_position_home:
-            rospy.loginfo(info)
-            rospy.loginfo("--------------------------------------")
-            self.home_row.extend([data.transform.translation.x, data.transform.translation.y,
-                data.transform.translation.z, data.transform.rotation.x, data.transform.rotation.y,
-                data.transform.rotation.z, data.transform.rotation.w]) 
-            self.get_position_home = False       
+            self.writer.writerow([data.range])
+        elif self.msg:
+            rospy.loginfo("DDDD \
+                           D   D \
+                           D   D \
+                           D   D \
+                           DDDD \
+                           \
+                           OOOOO \
+                           O   O \
+                           O   O \
+                           O   O \
+                           OOOOO \
+                           \
+                           N   N \
+                           NN  N \
+                           N N N \
+                           N  NN \
+                           N   N \
+                           \
+                           EEEEE \
+                           E \
+                           EEEEE \
+                           E \
+                           EEEEE")
+            self.msg = False
 
     @n.main_loop(frequency=100)
     def run(self):
