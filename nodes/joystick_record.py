@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import roshelper
-# import math
 import rospy
 from sensor_msgs.msg import Joy
 from sensor_msgs.msg import Range
@@ -14,8 +13,6 @@ n = roshelper.Node(NODE_NAME, anonymous=False)
 JOY_TOPIC = "joy"
 
 FILE_PATH = "/home/rcac/foresight_ws/src/uwb_variance/nodes/data.csv"
-DISTANCES = [.5, 1]
-ANGLES = [30, 60, 90]
 
 class Buttons(object):
     A = 0
