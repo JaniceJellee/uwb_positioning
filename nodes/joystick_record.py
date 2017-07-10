@@ -57,29 +57,29 @@ class JoystickCommandCenter(object):
             rospy.loginfo(info)
             self.writer.writerow([data.range])
         elif self.msg:
-            rospy.loginfo("DDDD \
-                           D   D \
-                           D   D \
-                           D   D \
-                           DDDD \
-                           \
-                           OOOOO \
-                           O   O \
-                           O   O \
-                           O   O \
-                           OOOOO \
-                           \
-                           N   N \
-                           NN  N \
-                           N N N \
-                           N  NN \
-                           N   N \
-                           \
-                           EEEEE \
-                           E \
-                           EEEEE \
-                           E \
-                           EEEEE")
+            rospy.loginfo("DDDD\n \
+                           D   D\n \
+                           D   D\n \
+                           D   D\n \
+                           DDDD\n \
+                           \n\
+                            OOOOO\n \
+                           O   O\n \
+                           O   O\n \
+                           O   O\n \
+                           OOOOO\n \
+                           \n\
+                            N   N\n \
+                           NN  N\n \
+                           N N N\n \
+                           N  NN\n \
+                           N   N\n \
+                           \n\
+                            EEEEE\n \
+                           E\n \
+                           EEEEE\n \
+                           E\n \
+                           EEEEE\n")
             self.msg = False
 
     @n.main_loop(frequency=100)
