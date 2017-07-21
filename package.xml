@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>uwb_variance</name>
+  <name>uwb_positioning</name>
   <version>0.0.0</version>
   <description>The decawave_localization package</description>
 
